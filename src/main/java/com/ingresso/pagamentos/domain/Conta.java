@@ -1,9 +1,9 @@
 package com.ingresso.pagamentos.domain;
 
+import com.ingresso.pagamentos.domain.valueobject.Cpf;
 import com.ingresso.pagamentos.exception.SaldoInsuficienteException;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.Embedded;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.util.Objects;
@@ -15,7 +15,8 @@ public class Conta {
     @Id
     private String idConta;
 
-    @Embedded // O número do CPF ficará na mesma tabela da conta
+    // O CpfConverter (autoApply = true) cuidará da conversão de/para o banco automaticamente.
+    // O banco de dados verá apenas uma coluna VARCHAR, mas o Java verá o Value Object rico.
     private Cpf titular;
     
     private BigDecimal saldo;
@@ -53,6 +54,6 @@ public class Conta {
     }
 
     public String getIdConta() { return idConta; }
-    public Documento getTitular() { return titular; }
+    public Cpf getTitular() { return titular; }
     public BigDecimal getSaldo() { return saldo; }
 }

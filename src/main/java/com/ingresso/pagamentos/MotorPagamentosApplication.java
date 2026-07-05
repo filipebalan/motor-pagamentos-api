@@ -8,7 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
 import com.ingresso.pagamentos.domain.Conta;
-import com.ingresso.pagamentos.domain.Cpf;
+import com.ingresso.pagamentos.domain.valueobject.Cpf;
 import org.springframework.scheduling.annotation.EnableAsync;
 import com.ingresso.pagamentos.repository.ContaRepository;
 
