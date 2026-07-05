@@ -118,7 +118,7 @@ O cliente envia o *payload*. A API valida a chave, gera um UUID, regista no cach
 ```http
 POST /api/v1/transferencias HTTP/1.1
 Host: localhost:8080
-X-API-KEY: pagamentos-api-key-2026-super-secreta
+X-API-KEY: <SUA_CHAVE_DE_API_AQUI>
 Content-Type: application/json
 
 {
