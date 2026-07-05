@@ -80,3 +80,84 @@ docker build -t motor-pagamentos .
 
 # 3. Suba o contêiner mapeando a porta 8080
 docker run -p 8080:8080 motor-pagamentos
+```
+
+### Opção 2: Via Maven (Local)
+Pré-requisitos: JDK 21 instalada.
+
+```bash
+./mvnw clean spring-boot:run
+```
+
+---
+
+## 📖 Documentação Interativa (Swagger)
+
+A aplicação conta com uma interface Swagger que mapeia automaticamente todos os endpoints e DTOs.
+
+Após iniciar o servidor, aceda no navegador:
+👉 **[http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)**
+
+---
+
+## 🔄 Fluxo de Funcionamento (Exemplos de API)
+
+⚠️ **ATENÇÃO:** Todos os endpoints exigem a chave de segurança no cabeçalho (*Header*):
+`X-API-KEY: pagamentos-api-key-2026-super-secreta`
+
+### 1. Criar a Transferência (A Ordem)
+O cliente envia o *payload*. A API valida a chave, gera um UUID, regista no cache, emite o evento e devolve a resposta em milissegundos.
+
+**Request (POST /api/v1/transferencias):**
+```http
+POST /api/v1/transferencias HTTP/1.1
+Host: localhost:8080
+X-API-KEY: pagamentos-api-key-2026-super-secreta
+Content-Type: application/json
+
+{
+  "idContaOrigem": "ID-001",
+  "idContaDestino": "ID-002",
+  "valor": 500.00
+}
+```
+
+**Response (202 Accepted):**
+```json
+{
+  "mensagem": "Transação aceita e enviada para processamento.",
+  "protocolo": "918e3863-6c8a-4f8a-a459-97fd1fd44e2e"
+}
+```
+
+### 2. Consultar o Status (O Polling)
+O cliente (*Front-end*) usa o protocolo para verificar se a transação em *background* teve sucesso ou se falhou (ex: saldo insuficiente).
+
+**Request (GET /api/v1/transferencias/{protocolo}):**
+```http
+GET /api/v1/transferencias/918e3863-6c8a-4f8a-a459-97fd1fd44e2e HTTP/1.1
+Host: localhost:8080
+X-API-KEY: pagamentos-api-key-2026-super-secreta
+```
+
+**Response Sucesso (200 OK):**
+```json
+{
+  "protocolo": "918e3863-6c8a-4f8a-a459-97fd1fd44e2e",
+  "status": "CONCLUIDA_COM_SUCESSO"
+}
+```
+
+---
+
+## 🛡️ Testes Automatizados
+
+O projeto possui testes de integração que cobrem o fluxo de ponta a ponta. O Spring Boot injeta um `MockMvc` já configurado com a *API Key* obrigatória para validar os *payloads*, *status HTTP* e retorno assíncrono.
+
+Para correr os testes localmente:
+```bash
+./mvnw clean test
+```
+
+---
+*Desenvolvido por **Filipe Balan**.* *Sinta-se à vontade para conectar-se comigo no [LinkedIn](https://www.linkedin.com/in/filipebalan/)!*
