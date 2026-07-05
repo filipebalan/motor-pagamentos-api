@@ -24,10 +24,16 @@ Além disso, processar regras de negócio pesadas e guardar na base de dados com
 
 Este repositório aplica práticas de desenvolvimento de nível Pleno/Sênior:
 
+* **Domain-Driven Design (DDD) Tático & Value Objects:**
+  Para combater o antipadrão da *Obsessão por Primitivos*, a validação do CPF não é feita de forma genérica como uma `String` espalhada pela aplicação. Foi implementado o **Value Object `Cpf`**, cuja validação matemática ocorre estritamente no momento da sua instanciação (no construtor). Se o CPF for inválido, o objeto sequer nasce na memória, protegendo a integridade do domínio.
+
+* **JPA AttributeConverter (Mapeamento Limpo):**
+  A integração do Value Object `Cpf` com o banco de dados é feita de forma transparente através de um `AttributeConverter`. O Hibernate converte automaticamente o objeto rico em uma coluna `VARCHAR` ao salvar, e reconstrói o objeto validado ao ler do banco, mantendo o modelo de dados desacoplado da infraestrutura.
+
 * **Segurança First (API Key):**
   A API não está exposta publicamente. Um filtro de segurança (Interceptor/Filter) atua como "Cão de Guarda", barrando imediatamente (Status 401) qualquer pedido que não possua a chave secreta de autorização, simulando o comportamento de um ambiente corporativo atrás de um API Gateway.
 
-* **Domain-Driven Design (DDD) Tático:**
+* **Domain-Driven Design (DDD) - Entidades Ricas:**
   A lógica de negócio não está espalhada em *Services* anêmicos. As entidades (como `Conta`) possuem regras próprias e métodos que protegem a sua integridade (ex: `validarSaldoSuficiente()`), garantindo um Domínio Rico.
   
 * **Pessimistic Locking (Bloqueio Pessimista):**
@@ -152,7 +158,7 @@ X-API-KEY: pagamentos-api-key-2026-super-secreta
 
 ## 🛡️ Testes Automatizados
 
-O projeto possui testes de integração que cobrem o fluxo de ponta a ponta. O Spring Boot injeta um `MockMvc` já configurado com a *API Key* obrigatória para validar os *payloads*, *status HTTP* e retorno assíncrono.
+O projeto possui testes de integração que cobrem o fluxo de ponta a ponta. O Spring Boot injeta um `MockMvc` já configurado com a *API Key* obrigatória para validar os *payloads*, *status HTTP* e retorno assíncrono. Os testes de domínio também validam o comportamento isolado do Value Object de CPF.
 
 Para correr os testes localmente:
 ```bash
